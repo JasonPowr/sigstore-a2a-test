@@ -120,3 +120,14 @@ serialized. With `rh-sigstore-a2a 0.0.1rc8`, repository, revision, builder ID,
 run ID, and start time are present. The requested workflow reference is not
 serialized, so the workflow emits a warning documenting that implementation
 gap without failing the signing test.
+
+## Test signed Agent Card verification
+
+The `Test signed Agent Card verification` workflow creates a signed fixture and
+then exercises the documented normal and verbose verification commands. It
+derives the expected GitHub workflow identity from `github.workflow_ref` and
+uses `https://token.actions.githubusercontent.com` as the expected issuer.
+
+The workflow also supplies a deliberately incorrect signer URI and requires
+that verification return a non-zero status. The successfully verified signed
+card is uploaded as the `verified-signed-agent-card` artifact.

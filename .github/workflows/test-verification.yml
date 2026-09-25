@@ -1,0 +1,79 @@
+name: Test signed Agent Card verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  verify:
+    name: Verify correct and incorrect signer identities
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EXPECTED_IDENTITY: ${{ github.server_url }}/${{ github.workflow_ref }}
+      EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Install rh-sigstore-a2a
+        run: python -m pip install rh-sigstore-a2a
+
+      - name: Record installed version
+        run: rh-sigstore-a2a --version
+
+      - name: Create signed Agent Card fixture
+        run: |
+          rh-sigstore-a2a sign agent-card.json \
+            --output verification-test.signed.json \
+            --use_ambient_credentials
+
+      - name: Verify expected signer identity
+        run: |
+          rh-sigstore-a2a verify verification-test.signed.json \
+            --identity "$EXPECTED_IDENTITY" \
+            --identity_provider "$EXPECTED_ISSUER"
+
+      - name: Verify with verbose certificate output
+        run: |
+          rh-sigstore-a2a --verbose verify verification-test.signed.json \
+            --identity "$EXPECTED_IDENTITY" \
+            --identity_provider "$EXPECTED_ISSUER"
+
+      - name: Confirm an incorrect identity fails
+        shell: bash
+        run: |
+          set +e
+          output="$({
+            rh-sigstore-a2a verify verification-test.signed.json \
+              --identity "https://github.com/wrong/repository/.github/workflows/wrong.yml@refs/heads/main" \
+              --identity_provider "$EXPECTED_ISSUER"
+          } 2>&1)"
+          status=$?
+          set -e
+
+          printf '%s\n' "$output"
+
+          if [ "$status" -eq 0 ]; then
+            echo "Verification unexpectedly accepted the wrong identity" >&2
+            exit 1
+          fi
+
+          echo "Incorrect identity failed with expected non-zero status: $status"
+
+      - name: Upload verified Agent Card
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: verified-signed-agent-card
+          path: verification-test.signed.json
+          if-no-files-found: error
+          retention-days: 7
