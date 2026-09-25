@@ -1,0 +1,43 @@
+name: Sign Agent Card
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  sign-agent-card:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install rh-sigstore-a2a
+        run: pip install rh-sigstore-a2a
+
+      - name: Sign Agent Card
+        run: |
+          rh-sigstore-a2a sign agent-card.json \
+            --output signed-agent-card.json \
+            --use_ambient_credentials \
+            --provenance \
+            --repository ${{ github.repository }}
+
+      - name: Verify signature
+        run: |
+          rh-sigstore-a2a verify signed-agent-card.json \
+            --identity_provider https://token.actions.githubusercontent.com \
+            --identity "https://github.com/${{ github.repository }}/.github/workflows/sign.yml@${{ github.ref }}" \
+            --repository ${{ github.repository }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-agent-card
+          path: signed-agent-card.json
+          retention-days: 30
