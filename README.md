@@ -79,3 +79,27 @@ The default command uses Sigstore's public production services. The signing
 event and certificate identity are recorded in the public Rekor transparency
 log. The certificate identifies the GitHub workflow and repository that
 performed the signing.
+
+## Test explicit identity tokens
+
+The `Test explicit identity-token signing` workflow requests a GitHub OIDC
+token with the `sigstore` audience and passes it directly to the CLI. It tests
+both documented forms:
+
+```console
+rh-sigstore-a2a sign agent-card.json \
+  --identity_token "$OIDC_TOKEN" \
+  --output identity-token.signed.json
+```
+
+```console
+rh-sigstore-a2a sign agent-card.json \
+  --identity_token "$OIDC_TOKEN" \
+  --client_id sigstore \
+  --output identity-token-client-id.signed.json
+```
+
+Run **Test explicit identity-token signing** from the repository's **Actions**
+page. The two signed files are uploaded together as the
+`explicit-token-signed-agent-cards` artifact. The workflow masks each token and
+keeps it only in the signing step's process environment.

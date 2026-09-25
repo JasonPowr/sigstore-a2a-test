@@ -1,0 +1,77 @@
+name: Test explicit identity-token signing
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  sign:
+    name: Sign with explicit GitHub OIDC tokens
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Install rh-sigstore-a2a
+        run: python -m pip install rh-sigstore-a2a
+
+      - name: Record installed version
+        run: rh-sigstore-a2a --version
+
+      - name: Sign with an explicit identity token
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          OIDC_TOKEN="$({
+            curl --fail --silent --show-error \
+              -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+              "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sigstore"
+          } | jq -er '.value')"
+          echo "::add-mask::$OIDC_TOKEN"
+
+          rh-sigstore-a2a sign agent-card.json \
+            --identity_token "$OIDC_TOKEN" \
+            --output identity-token.signed.json
+
+      - name: Sign with an explicit identity token and client ID
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          OIDC_TOKEN="$({
+            curl --fail --silent --show-error \
+              -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+              "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sigstore"
+          } | jq -er '.value')"
+          echo "::add-mask::$OIDC_TOKEN"
+
+          rh-sigstore-a2a sign agent-card.json \
+            --identity_token "$OIDC_TOKEN" \
+            --client_id sigstore \
+            --output identity-token-client-id.signed.json
+
+      - name: Validate signed JSON files
+        run: |
+          python -m json.tool identity-token.signed.json > /dev/null
+          python -m json.tool identity-token-client-id.signed.json > /dev/null
+
+      - name: Upload signed Agent Cards
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: explicit-token-signed-agent-cards
+          path: |
+            identity-token.signed.json
+            identity-token-client-id.signed.json
+          if-no-files-found: error
+          retention-days: 7
