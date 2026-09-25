@@ -24,10 +24,23 @@ jobs:
       - name: Install rh-sigstore-a2a
         run: python -m pip install rh-sigstore-a2a
 
+      - name: Check RHTAS TUF endpoint
+        run: |
+          curl --fail --show-error --location \
+            "$TAS_TUF_URL/root.json" \
+            --output /tmp/rhtas-root-live.json
+          python -m json.tool /tmp/rhtas-root-live.json > /dev/null
+
       - name: Bootstrap RHTAS trust
         run: |
-          rh-sigstore-a2a trust-instance "$TAS_TUF_ROOT" \
-            --instance "$TAS_TUF_URL"
+          if ! rh-sigstore-a2a trust-instance "$TAS_TUF_ROOT" \
+            --instance "$TAS_TUF_URL"; then
+            diagnostic_dir="$(mktemp -d)"
+            XDG_DATA_HOME="$diagnostic_dir/data" \
+            XDG_CACHE_HOME="$diagnostic_dir/cache" \
+            python -c 'from pathlib import Path; from sigstore.models import ClientTrustConfig; import os; ClientTrustConfig.from_tuf(os.environ["TAS_TUF_URL"], bootstrap_root=Path(os.environ["TAS_TUF_ROOT"]))'
+            exit 1
+          fi
 
       - name: Sign Agent Card
         run: |
