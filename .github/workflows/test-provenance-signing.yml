@@ -1,0 +1,115 @@
+name: Test SLSA provenance signing
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  sign:
+    name: Sign with explicit and detected provenance metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Install rh-sigstore-a2a
+        run: python -m pip install rh-sigstore-a2a
+
+      - name: Record installed version
+        run: rh-sigstore-a2a --version
+
+      - name: Sign with explicit provenance metadata
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          WORKFLOW_REF: .github/workflows/test-provenance-signing.yml@${{ github.ref }}
+        run: |
+          rh-sigstore-a2a sign agent-card.json \
+            --output provenance-explicit.signed.json \
+            --provenance \
+            --repository "${{ github.repository }}" \
+            --commit_sha "$COMMIT_SHA" \
+            --workflow_ref "$WORKFLOW_REF" \
+            --use_ambient_credentials
+
+      - name: Sign with automatically detected provenance metadata
+        run: |
+          rh-sigstore-a2a sign agent-card.json \
+            --output provenance-detected.signed.json \
+            --provenance \
+            --use_ambient_credentials
+
+      - name: Validate and summarize provenance
+        env:
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_REVISION: ${{ github.sha }}
+          EXPECTED_WORKFLOW_REF: .github/workflows/test-provenance-signing.yml@${{ github.ref }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          outputs = (
+              "provenance-explicit.signed.json",
+              "provenance-detected.signed.json",
+          )
+          summary = ["## Embedded provenance inspection", ""]
+
+          for output in outputs:
+              document = json.loads(Path(output).read_text())
+              provenance = document["attestations"]["provenanceBundle"]
+              source = provenance["buildDefinition"]["externalParameters"]["source"]
+              run_details = provenance["runDetails"]
+              metadata = run_details["metadata"]
+
+              assert source["repository"] == os.environ["EXPECTED_REPOSITORY"]
+              assert source["revision"] == os.environ["EXPECTED_REVISION"]
+              assert run_details["builder"]["id"]
+              assert metadata["buildInvocationId"] == os.environ["GITHUB_RUN_ID"]
+              assert metadata["buildStartedOn"]
+
+              serialized = json.dumps(provenance, sort_keys=True)
+              workflow_present = os.environ["EXPECTED_WORKFLOW_REF"] in serialized
+
+              summary.extend(
+                  [
+                      f"### `{output}`",
+                      "",
+                      f"- Repository: `{source['repository']}`",
+                      f"- Revision: `{source['revision']}`",
+                      f"- Builder: `{run_details['builder']['id']}`",
+                      f"- Run ID: `{metadata['buildInvocationId']}`",
+                      f"- Start time: `{metadata['buildStartedOn']}`",
+                      f"- Requested workflow reference serialized: `{workflow_present}`",
+                      "",
+                  ]
+              )
+
+              if not workflow_present:
+                  print(
+                      "::warning file=sigstore_a2a/provenance.py::"
+                      "The requested workflow reference is absent from serialized provenance"
+                  )
+
+          Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text("\n".join(summary))
+          PY
+
+      - name: Upload signed Agent Cards
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: provenance-signed-agent-cards
+          path: |
+            provenance-explicit.signed.json
+            provenance-detected.signed.json
+          if-no-files-found: error
+          retention-days: 7

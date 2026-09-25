@@ -103,3 +103,20 @@ Run **Test explicit identity-token signing** from the repository's **Actions**
 page. The two signed files are uploaded together as the
 `explicit-token-signed-agent-cards` artifact. The workflow masks each token and
 keeps it only in the signing step's process environment.
+
+## Test SLSA provenance metadata
+
+The `Test SLSA provenance signing` workflow signs the Agent Card twice:
+
+- once with explicit repository, commit SHA, and workflow reference values;
+- once using repository and commit metadata detected from GitHub Actions.
+
+Both commands add `--use_ambient_credentials` because signing inside GitHub
+Actions requires non-interactive OIDC authentication. The signed cards are
+uploaded as the `provenance-signed-agent-cards` artifact.
+
+The workflow summary reports the provenance fields that were actually
+serialized. With `rh-sigstore-a2a 0.0.1rc8`, repository, revision, builder ID,
+run ID, and start time are present. The requested workflow reference is not
+serialized, so the workflow emits a warning documenting that implementation
+gap without failing the signing test.
