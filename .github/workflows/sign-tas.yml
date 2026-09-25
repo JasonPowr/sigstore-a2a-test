@@ -1,0 +1,54 @@
+name: Sign Agent Card (TAS)
+
+on:
+  workflow_dispatch:
+
+env:
+  TAS_TUF_URL: "https://tuf-openshift-rhtas-operator.apps.ci-ln-4t4t45b-76ef8.aws-2.ci.openshift.org"
+  TAS_TUF_ROOT: "rhtas-root.json"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  sign-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install rh-sigstore-a2a
+        run: python -m pip install rh-sigstore-a2a
+
+      - name: Bootstrap RHTAS trust
+        run: |
+          rh-sigstore-a2a trust-instance "$TAS_TUF_ROOT" \
+            --instance "$TAS_TUF_URL"
+
+      - name: Sign Agent Card
+        run: |
+          rh-sigstore-a2a sign agent-card.json \
+            --output signed-agent-card-tas.json \
+            --instance "$TAS_TUF_URL" \
+            --use_ambient_credentials \
+            --provenance \
+            --repository "${{ github.repository }}"
+
+      - name: Verify Agent Card
+        run: |
+          rh-sigstore-a2a verify signed-agent-card-tas.json \
+            --instance "$TAS_TUF_URL" \
+            --identity_provider https://token.actions.githubusercontent.com \
+            --identity "${{ github.server_url }}/${{ github.workflow_ref }}" \
+            --repository "${{ github.repository }}"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: signed-agent-card-tas
+          path: signed-agent-card-tas.json
+          if-no-files-found: error
+          retention-days: 30

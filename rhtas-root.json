@@ -1,0 +1,71 @@
+{
+  "signatures": [
+    {
+      "keyid": "d7c0067b42f129b34e479f04e0d5508612ec495673eaa6d302cec0b441e9b515",
+      "sig": "091147a87f5a310710e3138d869547f8a8f87b5604bd5e9c8c6b11c216abd019407cc078c85f096074d3462ba4bc12598c4ba550fb10de5297ce25dbe79c872e6d7ef9f33d9617226cb39a5953edd78e4ee360e84928406424794bcff48df142d845915a995b890435c497784460ad69709844ae3342b65ac4d79a3ccb2a176861eb957d7d3048541563644342c6f650072b4202611e0ef539f6f7c1bf43087a9b09d7dba880917952afd90e67c8445ea751a894c7d288373ecd82530710f1600b2097cd2b7cc8db340d3e10d09b02538a4eaec7e1aa910bb36a3e834e4e574f18d095e7a874b11199505957277221ad36c8a9ca3a84e77a3b25f2fa7d630eba"
+    }
+  ],
+  "signed": {
+    "_type": "root",
+    "consistent_snapshot": true,
+    "expires": "2027-09-24T08:31:23Z",
+    "keys": {
+      "5f058b1c2bb77215d8deb54ac341a65b193d42b1db6d8b3835627af8ae617c97": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6e0m8PbUOsqWC8GbBUcZ\nnMmKuMRnWViZrNTNvbVYNQ9B31a/VFHsXjEc0M6RhwSOJmnQowDGEoiPJo/VtRGe\nveyofHDdxj3kSvV2rV5QRIMhpv91oZWg06SVSLSZLNY92cphJb96Dndd0ZwcxPVS\nIpx0mFpUWKLHGoPATJQh2XnYWgVHUAYxELL/diylZve25D6y6W1gDzT/DhFMMPvY\nDZQchRNywlQutIK5WYlnv4UbvmCvu/bZa5E7yvb4ieQwkUKGzAy+EwSg2CwSUtlt\nrHqlOeAqgX0ub7SNTtECy9vuFMpFClZ7ITfjIf/qruMmYDaboYqaxoq0Plk3VXZI\nnwIDAQAB\n-----END PUBLIC KEY-----"
+        },
+        "scheme": "rsassa-pss-sha256"
+      },
+      "7bbe926995cf2b3eacebc673f5cb8a6174efaed3237b6d961200c8b4a1846f81": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArvpK84UYuwYsHy2Fi0iY\nYTEqaEaZAzq4jPGN9lNwn2W136cRERkeEGCf4BU0lOqqOSJQScJ1KeVbg80DGWRL\nJ6e/Bnk8R2NHOB6T0z5DXJ2DAM6vE3RbtXO+jLimaue4zgx2/vpUnNh6H4vXl33y\nvU4dntspCadLxea9lP+W758JlDknzGR+u0Wt1ErConvE94ekTKEDQn1TKpOjY4Im\n2ddxMqIayPUTsqTk8or2DE747wOxW2Jzn4yv8iP/5t88LVe96q8tKn88LOr5NQYE\ncILtgfYGNQzGcsdDmPhpNwlDJGRo80bNyX3uLlkIwk28a2bacwOVbP00IWOL57jR\nIwIDAQAB\n-----END PUBLIC KEY-----"
+        },
+        "scheme": "rsassa-pss-sha256"
+      },
+      "87d5f0dd7c44cf2f5556fc5986fe41560fb4787ee203f4487147881eb9c8aa65": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw6SaHfejNq1FQ7h6xGq4\nFht+s7S803m4okgXABSlsk3US8Ly+ecgs9sVULWjLGPLN3SrtlEVcL9w2qr8jTY4\nfMqzR3+vvWMwEhIDzBb6dicDfRlIqOxn2icpdNeg0FQW3nwI38hg2V0E/J6anr/b\nPfAqvO64NfO1ZxJ3buWg+ZsaQY8j0fiRqDJ/lug1Z+7doAwjHjGkfeSEOXcLE/vy\nkDUUspBacLDuefRqsTltLKEeVLn5AXiMcaFxSdETuxL2JlIS9um0NJMRMHO/uzTP\nB6eeTY22BCFieQlO2c/UhihLHVKIHRWAECkHGP2HjsLGxXGkJXyQ2wBrmNuhR3w8\nVwIDAQAB\n-----END PUBLIC KEY-----"
+        },
+        "scheme": "rsassa-pss-sha256"
+      },
+      "d7c0067b42f129b34e479f04e0d5508612ec495673eaa6d302cec0b441e9b515": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1SOQKX6u5EPUw53ElJEM\nprG9FavewdZYagHgyl6nXH4wvNlYSQmwU/D59e92xF+nOkqkLjkZVI7KwtuEyuAB\nk3H6KvvfoaOzZMGg0+wDaT8/zGqq2G3lUQRqZBCR8PeHWGsBjb23Jv2By6hEPpdH\nEDcuPO+jyVWQgGRYaRM2wtZj/elVU1PtRgD2tEishPuk8HPsnWzqYgK2SxDUOi07\ntFiAsSLqkWA94RqH2Pw4DN61l+D0XfKWkUmpJAztNZYGpcN0GbX9NbXt7cuhIyP0\niBjkkRIBUw1KwxS9I8fcW8WZ335NvMLhvAy9msN2NIlf2GIaXWwX3doFGf1MQFuu\nnQIDAQAB\n-----END PUBLIC KEY-----"
+        },
+        "scheme": "rsassa-pss-sha256"
+      }
+    },
+    "roles": {
+      "root": {
+        "keyids": [
+          "d7c0067b42f129b34e479f04e0d5508612ec495673eaa6d302cec0b441e9b515"
+        ],
+        "threshold": 1
+      },
+      "snapshot": {
+        "keyids": [
+          "87d5f0dd7c44cf2f5556fc5986fe41560fb4787ee203f4487147881eb9c8aa65"
+        ],
+        "threshold": 1
+      },
+      "targets": {
+        "keyids": [
+          "7bbe926995cf2b3eacebc673f5cb8a6174efaed3237b6d961200c8b4a1846f81"
+        ],
+        "threshold": 1
+      },
+      "timestamp": {
+        "keyids": [
+          "5f058b1c2bb77215d8deb54ac341a65b193d42b1db6d8b3835627af8ae617c97"
+        ],
+        "threshold": 1
+      }
+    },
+    "spec_version": "1.0.31",
+    "version": 1
+  }
+}
