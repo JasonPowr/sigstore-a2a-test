@@ -1,0 +1,35 @@
+{
+  "name": "Ambient Credentials Test Agent",
+  "description": "A test Agent Card used to validate Sigstore signing with GitHub Actions OIDC.",
+  "version": "1.0.0",
+  "supportedInterfaces": [
+    {
+      "url": "https://example.com/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "0.3"
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "echo",
+      "name": "Echo",
+      "description": "Returns test input for documentation validation.",
+      "tags": [
+        "test"
+      ],
+      "examples": [
+        "Echo this message"
+      ]
+    }
+  ]
+}
